@@ -88,14 +88,7 @@
             let bounds = L.latLngBounds(${JSON.stringify(puntos)});
             map.fitBounds(bounds);
 
-            // 🔥 Ajustes para que se vea fuerte incluso con pocas coordenadas
-            L.heatLayer(${JSON.stringify(puntos)}, { 
-              radius: 40, 
-              blur: 20, 
-              maxZoom: 13, 
-              max: 1.0, 
-              gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'} 
-            }).addTo(map);
+            L.heatLayer(${JSON.stringify(puntos)}, { radius: 25, blur: 15 }).addTo(map);
           <\/script>
         </body>
         </html>
