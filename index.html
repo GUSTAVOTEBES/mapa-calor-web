@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mapa de Calor con Login</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    #map { height: 500px; width: 100%; display:none; }
+    #coords { width: 100%; height: 100px; display:none; }
+    #controls { display:none; }
+  </style>
+</head>
+<body>
+  <h2>Generador de Mapa de Calor 🌍</h2>
+
+  <!-- Login -->
+  <div id="login">
+    <p>Ingrese usuario y contraseña:</p>
+    <input type="text" id="user" placeholder="Usuario"><br><br>
+    <input type="password" id="pass" placeholder="Contraseña"><br><br>
+    <button onclick="login()">Ingresar</button>
+  </div>
+
+  <!-- Controles -->
+  <div id="controls">
+    <p>Ingrese coordenadas (Latitud,Longitud por línea):</p>
+    <textarea id="coords"></textarea><br>
+    <button onclick="generarMapa()">Generar mapa</button>
+  </div>
+
+  <!-- Mapa -->
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+  <script>
+    // 🔑 Usuario y contraseña definidos en el código
+    const USER = "admin";
+    const PASS = "1234";
+
+    let map;
+
+    function login() {
+      const u = document.getElementById("user").value;
+      const p = document.getElementById("pass").value;
+      if (u === USER && p === PASS) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("controls").style.display = "block";
+        document.getElementById("map").style.display = "block";
+
+        // Inicializar mapa
+        map = L.map('map').setView([-31.6, -60.7], 12);
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+          { attribution: "Tiles © Esri" }
+        ).addTo(map);
+      } else {
+        alert("❌ Usuario o contraseña incorrectos");
+      }
+    }
+
+    function generarMapa() {
+      let texto = document.getElementById("coords").value.trim();
+      if (!texto) {
+        alert("⚠️ Ingrese coordenadas");
+        return;
+      }
+
+      let puntos = [];
+      texto.split("\n").forEach(linea => {
+        let [lat, lon] = linea.split(",");
+        if (lat && lon) {
+          puntos.push([parseFloat(lat), parseFloat(lon)]);
+        }
+      });
+
+      if (puntos.length === 0) {
+        alert("❌ Formato incorrecto. Use Latitud,Longitud");
+        return;
+      }
+
+      // Limpiar capas anteriores
+      map.eachLayer(layer => {
+        if (layer instanceof L.LayerGroup) map.removeLayer(layer);
+      });
+
+      // Ajustar vista
+      let bounds = L.latLngBounds(puntos);
+      map.fitBounds(bounds);
+
+      // Agregar capa de calor
+      L.heatLayer(puntos, { radius: 25, blur: 15 }).addTo(map);
+    }
+  </script>
+</body>
+</html>
