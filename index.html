@@ -25,8 +25,11 @@
   <div id="controls">
     <p>Ingrese coordenadas (Latitud,Longitud por línea):</p>
     <textarea id="coords"></textarea><br>
-    <button onclick="generarMapa()">Generar mapa en nueva pestaña</button>
+    <button onclick="generarMapa()">Generar mapa</button>
   </div>
+
+  <!-- Mapa -->
+  <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
@@ -35,12 +38,22 @@
     const USER = "admin";
     const PASS = "1234";
 
+    let map;
+
     function login() {
       const u = document.getElementById("user").value;
       const p = document.getElementById("pass").value;
       if (u === USER && p === PASS) {
         document.getElementById("login").style.display = "none";
         document.getElementById("controls").style.display = "block";
+        document.getElementById("map").style.display = "block";
+
+        // Inicializar mapa
+        map = L.map('map').setView([-31.6, -60.7], 12);
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+          { attribution: "Tiles © Esri" }
+        ).addTo(map);
       } else {
         alert("❌ Usuario o contraseña incorrectos");
       }
@@ -66,36 +79,21 @@
         return;
       }
 
-      // Crear nueva ventana
-      let nuevaVentana = window.open("", "_blank");
-      nuevaVentana.document.write(`
-        <html>
-        <head>
-          <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-          <style>#map { height: 100vh; width: 100%; }</style>
-        </head>
-        <body>
-          <div id="map"></div>
-          <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-          <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-          <script>
-            let map = L.map('map').setView([${puntos[0][0]}, ${puntos[0][1]}], 12);
-            L.tileLayer(
-              "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-              { attribution: "Tiles © Esri" }
-            ).addTo(map);
+      // Limpiar capas anteriores
+      map.eachLayer(layer => {
+        if (layer instanceof L.LayerGroup) map.removeLayer(layer);
+      });
 
-            let bounds = L.latLngBounds(${JSON.stringify(puntos)});
-            map.fitBounds(bounds);
+      // Ajustar vista
+      let bounds = L.latLngBounds(puntos);
+      map.fitBounds(bounds);
 
-            L.heatLayer(${JSON.stringify(puntos)}, { radius: 25, blur: 15 }).addTo(map);
-          <\/script>
-        </body>
-        </html>
-      `);
+      // Agregar capa de calor
+      L.heatLayer(puntos, { radius: 25, blur: 15 }).addTo(map);
     }
   </script>
 </body>
 </html>
+
 
 
