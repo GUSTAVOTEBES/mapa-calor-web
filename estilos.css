@@ -1,0 +1,69 @@
+
+
+/** {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}*/
+
+body {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+#login {
+    background-color:darkgrey;
+    border-top: 4px solid #2957df;
+    border-radius: 3px;
+    
+}
+
+#login {
+  width: auto;  
+  display: flex;              /* activa flexbox solo en login */
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+#login .formulario {
+    margin-left: 8rem;
+}
+
+
+.formulario, .imagen {
+  flex: 1;                    /* formulario ocupa espacio */
+}
+
+.imagen img {
+  width: 80%;
+  height: auto;
+  max-height: 300px;
+  border-radius: 8px;
+  float: right;
+}
+
+
+#controls {
+    width: 25rem;
+    background-color:darkgrey;
+    border-bottom: 4px solid #2957df;
+    border-radius: 3px;
+    
+}
+
+#login button {
+    background-color: #2957df;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+#controls button {
+    background-color: #2957df;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+h2 {
+    font-size: 35px;
+    text-align: center;
+}
