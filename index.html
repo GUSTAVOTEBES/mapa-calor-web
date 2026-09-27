@@ -2,38 +2,50 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="estilos.css">
   <title>Mapa de Calor con Login</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <style>
-    #map { height: 500px; width: 100%; display:none; }
-    #coords { width: 100%; height: 100px; display:none; }
-    #controls { display:none; }
+    #map { height: 500px; width: 100%; }
+    #coords { width: 100%; height: 100px; }
+    #controls { display:block; }
   </style>
 </head>
 <body>
-  <h2>Generador de Mapa de Calor 🌍</h2>
+  <h2>Generador de Mapa de Calor</h2>
 
   <!-- Login -->
-  <div id="login">
+<div id="login">
+  <div class="formulario">
     <p>Ingrese usuario y contraseña:</p>
     <input type="text" id="user" placeholder="Usuario"><br><br>
     <input type="password" id="pass" placeholder="Contraseña"><br><br>
     <button onclick="login()">Ingresar</button>
   </div>
 
+  <div class="imagen">
+    <img src="./assets/images/oficina.jpg" alt="imagen principal">
+  </div>
+</div>
+
   <!-- Controles -->
   <div id="controls">
     <p>Ingrese coordenadas (Latitud,Longitud por línea):</p>
     <textarea id="coords"></textarea><br>
-    <button onclick="generarMapa()">Generar mapa en nueva pestaña</button>
+    <button onclick="generarMapa()">Generar mapa</button>
   </div>
+
+  <!-- Mapa -->
+  <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script>
-    // 🔑 Usuario y contraseña definidos en el código
-    const USER = "admin";
+    // Usuario y contraseña definidos en el código
+    const USER = "tebes";
     const PASS = "1234";
+
+    let map;
 
     function login() {
       const u = document.getElementById("user").value;
@@ -41,6 +53,14 @@
       if (u === USER && p === PASS) {
         document.getElementById("login").style.display = "none";
         document.getElementById("controls").style.display = "block";
+        document.getElementById("map").style.display = "block";
+
+        // Inicializar mapa
+        map = L.map('map').setView([-31.6, -60.7], 12);
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+          { attribution: "Tiles © Esri" }
+        ).addTo(map);
       } else {
         alert("❌ Usuario o contraseña incorrectos");
       }
@@ -66,40 +86,17 @@
         return;
       }
 
-      // Crear nueva ventana
-      let nuevaVentana = window.open("", "_blank");
-      nuevaVentana.document.write(`
-        <html>
-        <head>
-          <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-          <style>#map { height: 100vh; width: 100%; }</style>
-        </head>
-        <body>
-          <div id="map"></div>
-          <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-          <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-          <script>
-            let map = L.map('map').setView([${puntos[0][0]}, ${puntos[0][1]}], 12);
-            L.tileLayer(
-              "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-              { attribution: "Tiles © Esri" }
-            ).addTo(map);
+      // Limpiar capas anteriores
+      map.eachLayer(layer => {
+        if (layer instanceof L.LayerGroup) map.removeLayer(layer);
+      });
 
-            let bounds = L.latLngBounds(${JSON.stringify(puntos)});
-            map.fitBounds(bounds);
+      // Ajustar vista
+      let bounds = L.latLngBounds(puntos);
+      map.fitBounds(bounds);
 
-            // 🔥 Ajustes para que se vea fuerte incluso con pocas coordenadas
-            L.heatLayer(${JSON.stringify(puntos)}, { 
-              radius: 40, 
-              blur: 20, 
-              maxZoom: 13, 
-              max: 1.0, 
-              gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'} 
-            }).addTo(map);
-          <\/script>
-        </body>
-        </html>
-      `);
+      // Agregar capa de calor
+      L.heatLayer(puntos, { radius: 25, blur: 15, maxZoom: 13, max: 2.0 }).addTo(map);
     }
   </script>
 </body>
