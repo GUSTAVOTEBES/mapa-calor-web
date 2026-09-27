@@ -1,6 +1,9 @@
 
 body {
     background-image: url(sag.jpeg);
+    background-repeat: no-repeat;   /* evita que se repita */
+    background-size: cover;         /* ajusta para cubrir toda la pantalla */
+    background-position: center
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
